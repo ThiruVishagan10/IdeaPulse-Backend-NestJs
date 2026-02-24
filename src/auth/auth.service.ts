@@ -15,6 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  //Register logic
   async register(dto: RegisterDto) {
     const { email, password, name } = dto;
     const existingUser = await this.userService.findUserbyEmail(email);
@@ -39,6 +40,7 @@ export class AuthService {
     };
   }
 
+  //Login logic
   async login(dto: LoginDto) {
     const { email, password } = dto;
     const user = await this.userService.findUserbyEmail(email, true);
@@ -47,7 +49,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Credentials');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -63,6 +64,34 @@ export class AuthService {
       name: user.name,
       access_token,
       message: 'Login Successful',
+    };
+  }
+
+  //Google Login
+  async googleLogin(user: { email: string; name: string }) {
+    if (!user) throw new UnauthorizedException();
+
+    let existingUser = await this.userService.findUserbyEmail(user.email);
+
+    if (!existingUser) {
+      existingUser = await this.userService.createUsers(
+        user.email,
+        '', //No need for password due to Google Authentication
+        user.name,
+      );
+    }
+
+    const payload = {
+      sub: existingUser.id,
+      email: existingUser.email,
+    };
+
+    const access_token = this.jwtService.sign(payload);
+
+    return {
+      id: existingUser.id,
+      email: existingUser.email,
+      access_token,
     };
   }
 }

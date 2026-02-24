@@ -1,4 +1,5 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
+import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from '@/users/users.service';
 
@@ -10,16 +11,25 @@ export class TestController {
   ) {}
 
   @Get('find-user')
-  async findUser() {
+  findUser() {
     return this.userService.findUserbyEmail('thiruvishagan10@gmail.com');
   }
 
   @Post('create-user')
-  async createUser() {
+  createUser() {
     return this.userService.createUsers(
       'thiruvishagan10@gmail.com',
       'Password@123',
       'Thiru',
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  getTest(@Req() req: { user: { userId: string; email: string } }) {
+    return {
+      message: 'protected route works',
+      user: req.user,
+    };
   }
 }
