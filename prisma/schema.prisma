@@ -34,6 +34,8 @@ model Idea{
 
   user  User @relation(fields: [userId], references: [id])
   version IdeaVersion[]
+  
+  @@index([userId])
 }
 
 model IdeaVersion{
@@ -44,6 +46,9 @@ model IdeaVersion{
   createdAt DateTime @default(now())
 
   idea  Idea  @relation(fields: [ideaId], references: [id])
+  
+  @@index([ideaId])
+  @@index([isCurrent])
 }
 
 enum IdeaStatus{

@@ -19,6 +19,12 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  // DEV ONLY: Test Google OAuth without browser
+  @Post('google/test')
+  async googleTest(@Body() body: { email: string; name: string }) {
+    return this.authService.googleLogin(body);
+  }
+
   //google login
   @Get('google')
   @UseGuards(AuthGuard('google'))
@@ -27,6 +33,6 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+    return this.authService.googleLogin(req.user);
   }
 }

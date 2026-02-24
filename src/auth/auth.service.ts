@@ -69,16 +69,24 @@ export class AuthService {
 
   //Google Login
   async googleLogin(user: { email: string; name: string }) {
-    if (!user) throw new UnauthorizedException();
+    console.log('Google Login - Received user:', user);
+    
+    if (!user || !user.email) {
+      console.error('Google Login - Invalid user data');
+      throw new UnauthorizedException('Invalid user data from Google');
+    }
 
     let existingUser = await this.userService.findUserbyEmail(user.email);
+    console.log('Google Login - Existing user:', existingUser);
 
     if (!existingUser) {
+      console.log('Google Login - Creating new user:', user.email, user.name);
       existingUser = await this.userService.createUsers(
         user.email,
-        '', //No need for password due to Google Authentication
+        null,
         user.name,
       );
+      console.log('Google Login - User created:', existingUser);
     }
 
     const payload = {
@@ -91,6 +99,7 @@ export class AuthService {
     return {
       id: existingUser.id,
       email: existingUser.email,
+      name: existingUser.name,
       access_token,
     };
   }
