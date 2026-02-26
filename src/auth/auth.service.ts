@@ -70,7 +70,7 @@ export class AuthService {
   //Google Login
   async googleLogin(user: { email: string; name: string }) {
     console.log('Google Login - Received user:', user);
-    
+
     if (!user || !user.email) {
       console.error('Google Login - Invalid user data');
       throw new UnauthorizedException('Invalid user data from Google');
