@@ -7,8 +7,6 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { ControllerModule } from './ideas/controller.module';
-import { IdeasService } from './ideas/ideas.service';
 import { IdeasModule } from './ideas/ideas.module';
 
 @Module({
@@ -23,7 +21,6 @@ import { IdeasModule } from './ideas/ideas.module';
     TestModule,
     UsersModule,
     AuthModule,
-    ControllerModule,
     IdeasModule,
   ],
   controllers: [AppController],
@@ -33,7 +30,6 @@ import { IdeasModule } from './ideas/ideas.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    IdeasService,
   ],
 })
 export class AppModule {}

@@ -55,7 +55,7 @@ export class IdeasController {
   @Delete(':id')
   remove(
     @Request() req: { user: { userId: string } },
-    @Param(':id') ideaId: string,
+    @Param('id') ideaId: string,
   ) {
     return this.ideaService.softDelete(req.user.userId, ideaId);
   }

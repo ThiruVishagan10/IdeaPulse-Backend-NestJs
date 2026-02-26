@@ -41,6 +41,8 @@ export class AuthService {
   }
 
   //Login logic
+  // This method returns user data and should use 200 OK status, not 201 Created
+  // The HTTP status is typically controlled by the controller, not the service method
   async login(dto: LoginDto) {
     const { email, password } = dto;
     const user = await this.userService.findUserbyEmail(email, true);
