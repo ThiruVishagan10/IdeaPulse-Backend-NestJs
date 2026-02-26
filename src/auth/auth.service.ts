@@ -81,9 +81,10 @@ export class AuthService {
 
     if (!existingUser) {
       console.log('Google Login - Creating new user:', user.email, user.name);
+      const randomPassword = await bcrypt.hash(Math.random().toString(36), 10);
       existingUser = await this.userService.createUsers(
         user.email,
-        null,
+        randomPassword,
         user.name,
       );
       console.log('Google Login - User created:', existingUser);

@@ -13,45 +13,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User{
-  id String @id @default(uuid())
-  name String
-  email String @unique
-  password String? //nullable
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  idea  Idea[]
+  idea Idea[]
 }
- 
-model Idea{
-  id String @id @default(uuid())
-  userId String
-  status IdeaStatus @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
 
-  user  User @relation(fields: [userId], references: [id])
+model Idea {
+  id             String     @id @default(uuid())
+  userId         String
+  status         IdeaStatus @default(ACTIVE)
+  currentVersion Int        @default(0) //Atomic---> Either complete Entirely or not at all 
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @default(now())
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   version IdeaVersion[]
-  
+
   @@index([userId])
 }
 
-model IdeaVersion{
-  id String @id @default(uuid())
-  ideaId String
-  content String
-  isCurrent Boolean @default(true)
+model IdeaVersion {
+  id        String   @id @default(uuid())
+  ideaId    String
+  version   Int
+  title     String
+  content   String
   createdAt DateTime @default(now())
 
-  idea  Idea  @relation(fields: [ideaId], references: [id])
-  
-  @@index([ideaId])
-  @@index([isCurrent])
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@unique([ideaId, version])
+  @@index([ideaId, version(sort: Desc)])
 }
 
-enum IdeaStatus{
+enum IdeaStatus {
   ACTIVE
   ARCHIVED
   DELETED
