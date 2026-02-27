@@ -39,17 +39,46 @@ model Idea {
 }
 
 model IdeaVersion {
-  id        String   @id @default(uuid())
-  ideaId    String
-  version   Int
-  title     String
-  content   String
-  createdAt DateTime @default(now())
+  id              String        @id @default(uuid())
+  ideaId          String
+  version         Int
+  title           String
+  content         String
+  createdAt       DateTime      @default(now())
+  sourceType      VersionSource @default(USER)
+  aiResultId      String?
+  parentVersionId String?
 
-  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  idea      Idea       @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  aiResults AIResult[]
 
   @@unique([ideaId, version])
   @@index([ideaId, version(sort: Desc)])
+}
+
+model AIResult {
+  id            String       @id @default(uuid())
+  ideaVersionId String
+  type          AIResultType
+  prompt        String
+  response      String
+  createdAt     DateTime     @default(now())
+
+  ideaVersion IdeaVersion @relation(fields: [ideaVersionId], references: [id], onDelete: Cascade)
+
+  @@index([ideaVersionId])
+}
+
+enum VersionSource {
+  USER
+  AI
+}
+
+enum AIResultType {
+  SUGGESTION
+  SUMMARY
+  ENHANCEMENT
+  ANALYSIS
 }
 
 enum IdeaStatus {
