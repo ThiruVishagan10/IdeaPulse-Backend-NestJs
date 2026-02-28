@@ -8,6 +8,9 @@ import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { IdeasModule } from './ideas/ideas.module';
+import { AiModule } from './infrastructure/ai/ai.module';
+import { IdeaStudioController } from './idea-studio/features/idea-studio/idea-studio.controller';
+import { IdeaStudioService } from './idea-studio/features/idea-studio/idea-studio.service';
 
 @Module({
   imports: [
@@ -22,14 +25,16 @@ import { IdeasModule } from './ideas/ideas.module';
     UsersModule,
     AuthModule,
     IdeasModule,
+    AiModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, IdeaStudioController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    IdeaStudioService,
   ],
 })
 export class AppModule {}

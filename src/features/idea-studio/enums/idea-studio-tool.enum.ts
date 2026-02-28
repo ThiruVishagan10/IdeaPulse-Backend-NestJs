@@ -1,0 +1,8 @@
+export enum IdeaStudioTool {
+  REFINE = 'REFINE',
+  EXPAND = 'EXPAND',
+  SUMMARIZE = 'SUMMARIZE',
+  TONE = 'TONE',
+  STRUCTURE = 'STRUCTURE',
+  GENERATE_TAGS = 'GENERATE_TAGS',
+}
