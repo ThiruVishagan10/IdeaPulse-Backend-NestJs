@@ -16,11 +16,10 @@ export class IdeaStudioEngine {
     tools: string[];
     tone?: string;
   }) {
-    let workingContent = content;
-    const steps: Array<{ tool: string; output: string }> = [];
+    const results: Record<string, any> = {};
 
     for (const tool of tools) {
-      const prompt = buildIdeaStuioPrompt(tool, workingContent, tone);
+      const prompt = buildIdeaStuioPrompt(tool, content, tone);
       const temperature = toolTemperatureMap[tool] ?? 0.5;
 
       const result = await this.provider.generate({
@@ -28,13 +27,15 @@ export class IdeaStudioEngine {
         temperature,
       });
 
-      steps.push({ tool, output: result });
-      workingContent = result;
+      results[tool] = {
+        content: result,
+        metadata: {
+          model: 'gemini-pro',
+          timestamp: new Date().toISOString(),
+        },
+      };
     }
 
-    return {
-      finalOutput: workingContent,
-      steps,
-    };
+    return { results };
   }
 }
