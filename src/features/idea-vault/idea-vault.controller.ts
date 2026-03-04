@@ -8,15 +8,22 @@ export class IdeaVaultController {
   constructor(private readonly vaultService: IdeaVaultService) {}
 
   @Post('ideas')
-  createIdea(@Body() dto: CreateIdeaDto) {
-    const userId = 'mock-user';
-    return this.vaultService.createIdea(userId, dto);
+  async createIdea(@Body() dto: CreateIdeaDto) {
+    // Get first user from database for testing
+    const user = await this.vaultService['prisma'].user.findFirst();
+    if (!user) {
+      throw new Error('No users found. Please register a user first.');
+    }
+    return this.vaultService.createIdea(user.id, dto);
   }
 
   @Get('ideas')
-  getIdea() {
-    const userId = 'mock-user';
-    return this.vaultService.getIdeas(userId);
+  async getIdea() {
+    const user = await this.vaultService['prisma'].user.findFirst();
+    if (!user) {
+      throw new Error('No users found. Please register a user first.');
+    }
+    return this.vaultService.getIdeas(user.id);
   }
 
   @Get('ideas/:id')
@@ -24,7 +31,7 @@ export class IdeaVaultController {
     return this.vaultService.getIdeaById(id);
   }
 
-  @Post('idea/:id/version')
+  @Post('ideas/:id/version')
   createVersion(@Param('id') ideaId: string, @Body() dto: CreateVersionDto) {
     return this.vaultService.createVersion(ideaId, dto);
   }

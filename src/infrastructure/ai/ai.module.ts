@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { GeminiProvider } from './providers/gemini.provider';
 import { PrismaModule } from '@/prisma/prisma.module';
-import { IdeaVaultService } from '@/features/idea-vault/idea-vault.service';
+import { IdeaVaultModule } from '@/features/idea-vault/idea-vault.module';
 
 @Module({
-  imports: [PrismaModule, IdeaVaultService],
+  imports: [PrismaModule, IdeaVaultModule],
   providers: [AiService, GeminiProvider],
   exports: [AiService],
 })
