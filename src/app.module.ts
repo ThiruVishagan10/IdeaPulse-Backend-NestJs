@@ -3,11 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { TestModule } from '../test/test.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './features/users/users.module';
+import { AuthModule } from './features/auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { IdeasModule } from './ideas/ideas.module';
+import { IdeasModule } from './features/ideas/ideas.module';
+import { AiModule } from './infrastructure/ai/ai.module';
+import { IdeaStudioModule } from './features/idea-studio/idea-studio.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { IdeasModule } from './ideas/ideas.module';
     UsersModule,
     AuthModule,
     IdeasModule,
+    AiModule,
+    IdeaStudioModule,
   ],
   controllers: [AppController],
   providers: [

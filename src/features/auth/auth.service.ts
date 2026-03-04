@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
-import { UsersService } from '@/users/users.service';
+import { UsersService } from '@/features/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -45,17 +45,23 @@ export class AuthService {
   // The HTTP status is typically controlled by the controller, not the service method
   async login(dto: LoginDto) {
     const { email, password } = dto;
+    console.log('Login attempt - Email:', email);
+    
     const user = await this.userService.findUserbyEmail(email, true);
 
     if (!user || !user.password) {
+      console.log('Login failed - User not found or no password:', email);
       throw new UnauthorizedException('Invalid Credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      console.log('Login failed - Invalid password:', email);
       throw new UnauthorizedException('Invalid Credentials');
     }
+
+    console.log('Login successful - User:', { id: user.id, email: user.email, name: user.name });
 
     const payload = { sub: user.id, email: user.email };
     const access_token = this.jwtService.sign(payload);

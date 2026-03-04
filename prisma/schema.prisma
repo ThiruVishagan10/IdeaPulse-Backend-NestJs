@@ -13,6 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//////////////////////////////////////////////////////
+// USER
+//////////////////////////////////////////////////////
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -24,30 +28,44 @@ model User {
   idea Idea[]
 }
 
+//////////////////////////////////////////////////////
+// IDEA (Vault Container)
+//////////////////////////////////////////////////////
+
 model Idea {
   id             String     @id @default(uuid())
   userId         String
   status         IdeaStatus @default(ACTIVE)
   currentVersion Int        @default(0) //Atomic---> Either complete Entirely or not at all 
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @default(now())
+  isFavorite     Boolean    @default(false)
 
-  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  version IdeaVersion[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version   IdeaVersion[]
+  airesults AIResult[]
+
+  @@index([status])
   @@index([userId])
 }
 
+//////////////////////////////////////////////////////
+// IDEA VERSION (Immutable Snapshot)
+//////////////////////////////////////////////////////
+
 model IdeaVersion {
-  id              String        @id @default(uuid())
-  ideaId          String
-  version         Int
-  title           String
-  content         String
-  createdAt       DateTime      @default(now())
+  id      String @id @default(uuid())
+  ideaId  String
+  version Int
+  title   String
+  content String
+
   sourceType      VersionSource @default(USER)
   aiResultId      String?
   parentVersionId String?
+
+  createdAt DateTime @default(now())
 
   idea      Idea       @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   aiResults AIResult[]
@@ -56,29 +74,48 @@ model IdeaVersion {
   @@index([ideaId, version(sort: Desc)])
 }
 
+//////////////////////////////////////////////////////
+// AI RESULT (Workspace + Vault Integration)
+//////////////////////////////////////////////////////
+
 model AIResult {
-  id            String       @id @default(uuid())
-  ideaVersionId String
-  type          AIResultType
-  prompt        String
-  response      String
-  createdAt     DateTime     @default(now())
+  id String @id @default(uuid())
 
-  ideaVersion IdeaVersion @relation(fields: [ideaVersionId], references: [id], onDelete: Cascade)
+  ideaId        String?
+  ideaVersionId String?
 
+  domain AIDomain
+  tool   String
+
+  input    Json?
+  response Json
+
+  modelUsed   String?
+  temperature Float?
+
+  createdAt DateTime @default(now())
+
+  ideaVersion IdeaVersion? @relation(fields: [ideaVersionId], references: [id], onDelete: Cascade)
+  idea        Idea?        @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@index([ideaId])
   @@index([ideaVersionId])
+  @@index([domain])
 }
+
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
 
 enum VersionSource {
   USER
   AI
 }
 
-enum AIResultType {
-  SUGGESTION
-  SUMMARY
-  ENHANCEMENT
-  ANALYSIS
+enum AIDomain {
+  IDEA_STUDIO
+  ANALYZER
+  MOODBOARD
 }
 
 enum IdeaStatus {
