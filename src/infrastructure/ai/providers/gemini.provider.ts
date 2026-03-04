@@ -1,32 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { AIProvider } from './ai-provider.interface';
-import { title } from 'process';
+import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
+import type { AIProvider } from './ai-provider.interface';
 
 @Injectable()
 export class GeminiProvider implements AIProvider {
-  private genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  private model: GenerativeModel;
 
-  async generate(input: {
-    title: string;
-    content: string;
-    type: string;
-  }): Promise<string> {
-    const model = this.genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+  constructor() {
+    const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+    this.model = genAi.getGenerativeModel({
+      model: 'gemini-2.5-flash',
     });
-
-    const prompt = this.buildPrompt(title, contentSecurityPolicy, type);
-
-    const result = await model.generateContent(prompt);
-    const reponse = await result.response;
-
-    return reponse.text();
   }
 
-  private buildPrompt(title: string, content: string, type: string){
-    switch(type){
-        case 'Summary'
-    }
+  async generate({
+    prompt,
+    temperature = 0.7,
+  }: {
+    prompt: string;
+    temperature?: number;
+  }): Promise<string> {
+    const result = await this.model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature },
+    });
+    const response = result.response;
+    return response.text();
   }
 }

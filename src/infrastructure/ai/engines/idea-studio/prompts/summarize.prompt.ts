@@ -1,4 +1,4 @@
-export const SummarizePrompt = (content: string) => `
+export const summarizePrompt = (content: string) => `
 You are an AI structuring assistant.
 
 Break the following idea into structured sections:

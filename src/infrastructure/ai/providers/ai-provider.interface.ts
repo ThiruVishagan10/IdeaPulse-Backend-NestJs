@@ -1,7 +1,3 @@
 export interface AIProvider {
-  generate(input: {
-    title: string;
-    content: string;
-    type: string;
-  }): Promise<string>;
+  generate(input: { prompt: string; temperature?: number }): Promise<string>;
 }

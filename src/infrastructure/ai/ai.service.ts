@@ -1,13 +1,22 @@
-// import {
-//   Injectable,
-//   NotFoundException,
-//   ForbiddenException,
-// } from '@nestjs/common';
-// import { PrismaService } from '@/prisma/prisma.service';
-// import { AIResultType, IdeaStatus } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { GeminiProvider } from './providers/gemini.provider';
 
-// @Injectable()
-// export class AiService {
-//   constructor(private readonly prisma: PrismaService) {}
+interface GenerateOptions {
+  prompt: string;
+  temperature?: number;
+  model?: string;
+}
 
-// }
+@Injectable()
+export class AiService {
+  constructor(private readonly provider: GeminiProvider) {}
+
+  async generate(options: GenerateOptions): Promise<string> {
+    const { prompt, temperature = 0.5 } = options;
+
+    return await this.provider.generate({
+      prompt,
+      temperature,
+    });
+  }
+}
