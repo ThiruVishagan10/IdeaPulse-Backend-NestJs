@@ -116,6 +116,7 @@ enum AIDomain {
   IDEA_STUDIO
   ANALYZER
   MOODBOARD
+  IDEA_VAULT
 }
 
 enum IdeaStatus {
