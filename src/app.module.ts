@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { IdeasModule } from './features/ideas/ideas.module';
 import { AiModule } from './infrastructure/ai/ai.module';
 import { IdeaStudioModule } from './features/idea-studio/idea-studio.module';
+import { IdeaVaultModule } from './features/idea-vault/idea-vault.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { IdeaStudioModule } from './features/idea-studio/idea-studio.module';
     IdeasModule,
     AiModule,
     IdeaStudioModule,
+    IdeaVaultModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "AIDomain" ADD VALUE 'IDEA_VAULT';
