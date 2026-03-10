@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"E:/ThisAi/IdeaPulse/Ideapulse-backend/project\" && npm run build 2>&1)",
+      "Bash(cd \"E:/ThisAi/IdeaPulse/Ideapulse-backend/project\" && npm run build 2>&1; echo \"EXIT_CODE: $?\")"
+    ]
+  }
+}
