@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
-import { TestModule } from '../test/test.module';
 import { UsersModule } from './features/users/users.module';
 import { AuthModule } from './features/auth/auth.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -21,7 +20,6 @@ import { IdeaVaultModule } from './features/idea-vault/idea-vault.module';
       },
     ]),
     PrismaModule,
-    TestModule,
     UsersModule,
     AuthModule,
     IdeasModule,
