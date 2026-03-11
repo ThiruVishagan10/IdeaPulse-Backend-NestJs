@@ -1,22 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
-    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-      throw new Error(
-        'Google OAuth credentials are not defined in environment variables',
+    const logger = new Logger(GoogleStrategy.name);
+    const clientID = process.env.GOOGLE_CLIENT_ID || '';
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+
+    if (!clientID || !clientSecret) {
+      logger.warn(
+        'Google OAuth credentials are not defined in environment variables. Strategy initialized with empty credentials — OAuth flows will fail until credentials are provided.',
       );
     }
 
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientID,
+      clientSecret,
       callbackURL:
         process.env.GOOGLE_CALLBACK_URL ||
-        'http://localhost:3000/auth/google/callback',
+        'https://ideapulse-pathbridge.vercel.app/auth/google/callback',
       scope: ['email', 'profile'],
     });
   }
