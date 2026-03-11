@@ -1,5 +1,10 @@
 import 'reflect-metadata';
-import 'tsconfig-paths/register';
+import { register } from 'tsconfig-paths';
+import { resolve } from 'path';
+register({
+  baseUrl: resolve(__dirname, '..'),
+  paths: { '@/*': ['src/*'] },
+});
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
