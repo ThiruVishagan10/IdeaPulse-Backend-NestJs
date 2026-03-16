@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import type { Prisma } from '@prisma/client';
-import { IdeaStudioEngine } from '@/infrastructure/ai/engines/idea-studio/idea-studio.engine';
+import { IdeaStudioEngine } from '../../../infrastructure/ai/engines/idea-studio/idea-studio.engine';
 import { GenerateIdeaDto } from './dto/generate-idea.dto';
 
 @Injectable()

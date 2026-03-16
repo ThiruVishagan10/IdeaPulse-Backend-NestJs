@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GeminiProvider } from './providers/gemini.provider';
-import { IdeaVaultService } from '@/features/idea-vault/idea-vault.service';
+import { IdeaVaultService } from '../../features/idea-vault/idea-vault.service';
 
 interface GenerateOptions {
   prompt: string;

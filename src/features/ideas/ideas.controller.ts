@@ -9,7 +9,7 @@ import {
   Request,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '@/features/auth/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { IdeasService } from './ideas.service';
 import { CreateIdeaDto } from './dto/create-idea.dto';
 import { CreateVersionDto } from './dto/create-version.dto';

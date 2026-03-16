@@ -3,7 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { CreateIdeaDto } from './dto/create-idea.dto';
 import { CreateVersionDto } from './dto/create-version.dto';
 import { IdeaStatus } from '@prisma/client';
