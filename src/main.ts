@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -10,8 +11,13 @@ async function bootstrap() {
   app.use(helmet());
 
   // Enable CORS
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.LOCAL_FRONTEND_URL || 'http://localhost:3001',
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: allowedOrigins,
     credentials: true,
   });
 
