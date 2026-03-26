@@ -5,11 +5,11 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
 }
 
 //////////////////////////////////////////////////////
@@ -17,14 +17,32 @@ datasource db {
 //////////////////////////////////////////////////////
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(uuid())
+    name      String
+    email     String   @unique
+    password  String?  // Nullable: Google OAuth users have no password
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  idea Idea[]
+    idea Idea[]
+}
+
+//////////////////////////////////////////////////////
+// IDEA VERSION TOOL(Version Tool)
+//////////////////////////////////////////////////////
+
+model VersionTool {
+    id String @id @default(uuid())
+
+    ideaVersionId String
+    tool          AITool
+    order         Int
+
+    createdAt DateTime @default(now())
+
+    ideaVersion IdeaVersion @relation(fields: [ideaVersionId], references: [id], onDelete: Cascade)
+
+    @@index([ideaVersionId])
 }
 
 //////////////////////////////////////////////////////
@@ -32,21 +50,21 @@ model User {
 //////////////////////////////////////////////////////
 
 model Idea {
-  id             String     @id @default(uuid())
-  userId         String
-  status         IdeaStatus @default(ACTIVE)
-  currentVersion Int        @default(0) //Atomic---> Either complete Entirely or not at all 
-  isFavorite     Boolean    @default(false)
+    id             String     @id @default(uuid())
+    userId         String
+    status         IdeaStatus @default(ACTIVE)
+    currentVersion Int        @default(0) //Atomic---> Either complete Entirely or not at all
+    isFavorite     Boolean    @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  version   IdeaVersion[]
-  airesults AIResult[]
+    user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    version   IdeaVersion[]
+    airesults AIResult[]
 
-  @@index([status])
-  @@index([userId])
+    @@index([status])
+    @@index([userId])
 }
 
 //////////////////////////////////////////////////////
@@ -54,23 +72,27 @@ model Idea {
 //////////////////////////////////////////////////////
 
 model IdeaVersion {
-  id      String @id @default(uuid())
-  ideaId  String
-  version Int
-  title   String
-  content String
+    id      String @id @default(uuid())
+    ideaId  String
+    version Int
+    title   String
+    content String
 
-  sourceType      VersionSource @default(USER)
-  aiResultId      String?
-  parentVersionId String?
+    sourceType      VersionSource @default(USER)
+    aiResultId      String?       // The AIResult that generated this version (when sourceType = AI)
+    parentVersionId String?       // The version this was derived from
 
-  createdAt DateTime @default(now())
+    createdAt DateTime @default(now())
 
-  idea      Idea       @relation(fields: [ideaId], references: [id], onDelete: Cascade)
-  aiResults AIResult[]
+    idea           Idea          @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+    sourceAiResult AIResult?     @relation("VersionSourceResult", fields: [aiResultId], references: [id], onDelete: SetNull)
+    parent         IdeaVersion?  @relation("VersionHistory", fields: [parentVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    children       IdeaVersion[] @relation("VersionHistory")
+    aiResults      AIResult[]    @relation("VersionAiResults")
+    versionTools   VersionTool[]
 
-  @@unique([ideaId, version])
-  @@index([ideaId, version(sort: Desc)])
+    @@unique([ideaId, version])
+    @@index([ideaId, version(sort: Desc)])
 }
 
 //////////////////////////////////////////////////////
@@ -78,28 +100,32 @@ model IdeaVersion {
 //////////////////////////////////////////////////////
 
 model AIResult {
-  id String @id @default(uuid())
+    id String @id @default(uuid())
 
-  ideaId        String?
-  ideaVersionId String?
+    ideaId        String?
+    ideaVersionId String?
 
-  domain AIDomain
-  tool   String
+    domain AIDomain
+    tool   AITool
 
-  input    Json?
-  response Json
+    input    Json?
+    response Json
 
-  modelUsed   String?
-  temperature Float?
+    modelUsed   String?
+    temperature Float?
 
-  createdAt DateTime @default(now())
+    createdAt DateTime @default(now())
 
-  ideaVersion IdeaVersion? @relation(fields: [ideaVersionId], references: [id], onDelete: Cascade)
-  idea        Idea?        @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+    ideaVersion       IdeaVersion?  @relation("VersionAiResults", fields: [ideaVersionId], references: [id], onDelete: Cascade)
+    idea              Idea?         @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+    generatedVersions IdeaVersion[] @relation("VersionSourceResult")
 
-  @@index([ideaId])
-  @@index([ideaVersionId])
-  @@index([domain])
+    @@index([ideaId])
+    @@index([ideaVersionId])
+    @@index([domain])
+    @@index([tool])
+    @@index([ideaId, tool])
+    @@index([ideaVersionId, tool])
 }
 
 //////////////////////////////////////////////////////
@@ -107,19 +133,29 @@ model AIResult {
 //////////////////////////////////////////////////////
 
 enum VersionSource {
-  USER
-  AI
+    USER
+    AI
 }
 
 enum AIDomain {
-  IDEA_STUDIO
-  ANALYZER
-  MOODBOARD
-  IDEA_VAULT
+    IDEA_STUDIO
+    ANALYZER
+    MOODBOARD
+    IDEA_VAULT
 }
 
 enum IdeaStatus {
-  ACTIVE
-  ARCHIVED
-  DELETED
+    ACTIVE
+    ARCHIVED
+    DELETED
+}
+
+enum AITool {
+    EXPAND
+    SUMMARIZE
+    USE_CASES
+    TECHNICAL
+    MARKET_POSITIONING
+    ROADMAP
+    CHAIN
 }
